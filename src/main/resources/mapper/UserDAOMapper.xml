@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.baizhi.dao.UserDAO">
+    <resultMap type="com.baizhi.entity.User" id="userMap">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="salary" column="salary"/>
+        <result property="age" column="age"/>
+        <result property="pid" column="pid"/>
+        <association property="part" javaType="com.baizhi.entity.Part">
+            <id property="id" column="ptid"/>
+            <result property="name" column="pname"/>
+        </association>
+    </resultMap>
+    <select id="findBypage" resultMap="userMap">
+        select u.*,p.id ptid,p.name pname from emp_user u LEFT JOIN emp_part p on u.pid=p.id <where>
+        <if test="searchOper=='eq'">
+            u.${searchField} = #{searchString}
+        </if>
+        <if test="searchOper=='ne'">
+            u.${searchField} != #{searchString}
+        </if>
+    </where> limit #{begin},#{end}
+    </select>
+
+    <select id="findCount" resultType="Integer">
+        select count(*) from emp_user
+    </select>
+    <select id="findAll" resultMap="userMap">
+        select u.*,p.id ptid,p.name pname from emp_user u LEFT JOIN emp_part p on u.pid=p.id
+    </select>
+    <insert id="add" parameterType="com.baizhi.entity.User">
+        insert into emp_user values(#{id},#{name},#{salary},#{age},#{pid})
+    </insert>
+    <select id="findOne" parameterType="String" resultMap="userMap">
+        select u.*,p.id ptid,p.name pname from emp_user u LEFT JOIN emp_part p on u.pid=p.id where u.id=#{arg0}
+    </select>
+    <update id="update" parameterType="com.baizhi.entity.User">
+        update emp_user set name=#{name},salary=#{salary},age=#{age},pid=#{pid} where id=#{id}
+    </update>
+    <delete id="delete" parameterType="String">
+        delete from emp_user where id=#{arg0}
+    </delete>
+    <delete id="deleteBypid" parameterType="String">
+        delete from emp_user where pid=#{arg0}
+    </delete>
+</mapper>
